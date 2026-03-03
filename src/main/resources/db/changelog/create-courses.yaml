@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-courses
+      author: azaliya
+      changes:
+        - createTable:
+            tableName: courses
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: course_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(755)
+                  constraints:
+                    nullable: false

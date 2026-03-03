@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-groups
+      author: azaliya
+      changes:
+        - createTable:
+            tableName: groups
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: group_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true #Не повторяются
