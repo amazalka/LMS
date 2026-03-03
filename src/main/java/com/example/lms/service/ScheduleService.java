@@ -56,16 +56,6 @@ public class ScheduleService {
         return scheduleRepository.save(schedule);
     }
 
-    //Назначать время проведения курса для определенной группы
-    public ScheduleEntity assignCourseTimeForAGroup (LocalDateTime time, Long groupId, Long courseId){
-        ScheduleEntity schedule = scheduleRepository.findByGroup_IdAndCourse_Id(groupId, courseId).orElseThrow(() -> new ScheduleNotFoundException(groupId, courseId));
-        if (schedule.getTime() != null){
-            throw new TimeIsSetException("Время уже назначено");
-        }
-        schedule.setTime(time);
-        return schedule;
-    }
-
     //Изменять время проведения курса для определенной группы
     public void updateTheTimeForAGroup(LocalDateTime time, Long groupId, Long courseId) {
         ScheduleEntity schedule = scheduleRepository.findByGroup_IdAndCourse_Id(groupId, courseId).orElseThrow(() -> new ScheduleNotFoundException(groupId, courseId));
