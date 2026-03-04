@@ -9,8 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Long> {
-    Optional<ScheduleEntity> findByGroup_Id (Long groupId);
     List<ScheduleEntity> findAllByGroup_Id(Long groupId);
     List<ScheduleEntity> findAllByTeacher_Id(Long teacherId);
     Optional<ScheduleEntity> findByGroup_IdAndCourse_Id (Long groupId, Long courseId);
+    Optional<ScheduleEntity> findBySchedule_Id (Long scheduleId);
 }

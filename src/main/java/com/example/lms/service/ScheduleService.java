@@ -1,17 +1,20 @@
 package com.example.lms.service;
 
 import com.example.lms.exception.*;
+import com.example.lms.model.CourseEntity;
+import com.example.lms.model.GroupEntity;
 import com.example.lms.model.ScheduleEntity;
+import com.example.lms.model.TeacherEntity;
 import com.example.lms.repository.CourseRepository;
 import com.example.lms.repository.GroupRepository;
 import com.example.lms.repository.ScheduleRepository;
+import com.example.lms.repository.TeacherRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 @RequiredArgsConstructor
 @Service
@@ -20,10 +23,19 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final GroupRepository groupRepository;
     private final CourseRepository courseRepository;
+    private final TeacherRepository teacherRepository;
 
     //Добавление группы на курсы
     //Назначение времени проведения курса для определенной группы
-    public ScheduleEntity addSchedule(ScheduleEntity schedule) {
+    public ScheduleEntity createSchedule(Long groupId, Long courseId, Long teacherId, LocalDateTime time) {
+        GroupEntity group = groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
+        CourseEntity course = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFoundException(courseId));
+        TeacherEntity teacher = teacherRepository.findById(teacherId).orElseThrow(() -> new TeacherNotFoundException(teacherId));
+        ScheduleEntity schedule = new ScheduleEntity();
+        schedule.setTime(time);
+        schedule.setGroup(group);
+        schedule.setTeacher(teacher);
+        schedule.setCourse(course);
         return scheduleRepository.save(schedule);
     }
 
@@ -48,23 +60,15 @@ public class ScheduleService {
         return scheduleRepository.findById(id).orElseThrow(() -> new ScheduleNotFoundException(id));
     }
 
-    //Добавлять группы на курсы
-    public ScheduleEntity assignGroupToCourse(Long groupId, Long courseId) {
-        ScheduleEntity schedule = new ScheduleEntity();
-        schedule.setGroup(groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId)));
-        schedule.setCourse(courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFoundException(courseId)));
-        return scheduleRepository.save(schedule);
-    }
-
     //Изменять время проведения курса для определенной группы
-    public void updateTheTimeForAGroup(LocalDateTime time, Long groupId, Long courseId) {
-        ScheduleEntity schedule = scheduleRepository.findByGroup_IdAndCourse_Id(groupId, courseId).orElseThrow(() -> new ScheduleNotFoundException(groupId, courseId));
+    public void updateTheTimeForAGroup(LocalDateTime time, Long scheduleId) {
+        ScheduleEntity schedule = scheduleRepository.findBySchedule_Id(scheduleId).orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
         schedule.setTime(time);
     }
 
     //Удалять время проведения курса для определенной группы
-    public void deleteTheTimeForAGroup(Long groupId, Long courseId) {
-        ScheduleEntity schedule = scheduleRepository.findByGroup_IdAndCourse_Id(groupId, courseId).orElseThrow(() -> new ScheduleNotFoundException(groupId, courseId));
+    public void deleteTheTimeForAGroup(Long scheduleId) {
+        ScheduleEntity schedule = scheduleRepository.findBySchedule_Id(scheduleId).orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
         schedule.setTime(null);
     }
 
