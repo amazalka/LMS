@@ -5,3 +5,4 @@ public class TimeIsSetException extends NotFoundException {
         super(message);
     }
 }
+
