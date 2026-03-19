@@ -41,8 +41,8 @@ public class StudentService {
     }
 
     public List<StudentResponse> getAllStudents(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<StudentEntity> studentPage = studentRepository.findAll(pageable);
+        Pageable pageabl = PageRequest.of(page, size);
+        Page<StudentEntity> studentPage = studentRepository.findAll(pageabl);
         return studentMapper.toResponse(studentPage.getContent());
     }
 
