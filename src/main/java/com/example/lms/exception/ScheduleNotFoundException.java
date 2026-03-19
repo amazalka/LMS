@@ -5,3 +5,4 @@ public class ScheduleNotFoundException extends RuntimeException {
       super("Schedule with id = " + id + "not found");
     }
 }
+
