@@ -1,7 +1,7 @@
 package com.example.lms.exception;
 
-public class CourseNotFoundException extends NotFoundException {
+public class CourseNotFoundException extends RuntimeException {
     public CourseNotFoundException(Long id) {
-        super("Course with id = " + id + " not found");
+        super("Course with id = " + id + "not found");
     }
 }

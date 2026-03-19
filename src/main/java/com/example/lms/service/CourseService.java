@@ -1,9 +1,6 @@
 package com.example.lms.service;
 
-import com.example.lms.dto.request.CourseRequest;
-import com.example.lms.dto.response.CourseResponse;
 import com.example.lms.exception.CourseNotFoundException;
-import com.example.lms.mapper.CourseMapper;
 import com.example.lms.model.CourseEntity;
 import com.example.lms.repository.CourseRepository;
 import jakarta.transaction.Transactional;
@@ -17,31 +14,28 @@ import java.util.List;
 @Transactional
 public class CourseService {
     private final CourseRepository courseRepository;
-    private final CourseMapper courseMapper;
 
-    public CourseResponse addCourse(CourseRequest request) {
-        CourseEntity course = courseMapper.toEntity(request);
+    public CourseEntity addCourse(CourseEntity course) {
         courseRepository.save(course);
-        return courseMapper.toResponse(course);
+        return course;
     }
 
-    public CourseResponse updateCourse(Long id, CourseRequest request) {
-        CourseEntity course = courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException(id));
-        courseMapper.updateCourseFromRequest(request, course);
-        return courseMapper.toResponse(course);
+    public CourseEntity updateCourse(Long id, CourseEntity updateCourse) {
+        CourseEntity course = courseRepository.findById(id).orElseThrow();
+        course.setName(updateCourse.getName());
+        course.setDescription(updateCourse.getDescription());
+        return courseRepository.save(course);
     }
 
     public void deleteCourse(Long id) {
-        CourseEntity course = courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException(id));
-        courseRepository.delete(course);
+        courseRepository.deleteById(id);
     }
 
-    public CourseResponse getByIdCourse(Long id) {
-        CourseEntity course = courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException(id));
-        return courseMapper.toResponse(course);
+    public CourseEntity getByIdCourse(Long id) {
+        return courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException(id));
     }
 
-    public List<CourseResponse> getAllCourses() {
-        return courseMapper.toResponse(courseRepository.findAll());
+    public List<CourseEntity> getAllCourses() {
+        return courseRepository.findAll();
     }
 }

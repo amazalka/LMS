@@ -1,9 +1,6 @@
 package com.example.lms.service;
 
-import com.example.lms.dto.request.GroupRequest;
-import com.example.lms.dto.response.GroupResponse;
 import com.example.lms.exception.GroupNotFoundException;
-import com.example.lms.mapper.GroupMapper;
 import com.example.lms.model.GroupEntity;
 import com.example.lms.repository.GroupRepository;
 import jakarta.transaction.Transactional;
@@ -17,31 +14,26 @@ import java.util.List;
 @Transactional
 public class GroupService {
     private final GroupRepository groupRepository;
-    private final GroupMapper groupMapper;
 
-    public GroupResponse addGroup(GroupRequest request) {
-        GroupEntity group = groupMapper.toEntity(request);
-        groupRepository.save(group);
-        return groupMapper.toResponse(group);
+    public GroupEntity addGroup(GroupEntity group) {
+        return groupRepository.save(group);
     }
 
     public void deleteGroup(Long id) {
-        GroupEntity group = groupRepository.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
-        groupRepository.delete(group);
+        groupRepository.deleteById(id);
     }
 
-    public GroupResponse updateGroup(Long id, GroupRequest request) {
+    public GroupEntity updateGroup(Long id, GroupEntity updateGroup) {
         GroupEntity group = groupRepository.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
-        groupMapper.updateGroupFromRequest(group, request);
-        return groupMapper.toResponse(group);
+        group.setName(updateGroup.getName());
+        return group;
     }
 
-    public List<GroupResponse> getAllGroups() {
-        return groupMapper.toResponse(groupRepository.findAll());
+    public List<GroupEntity> getAllGroups() {
+        return groupRepository.findAll();
     }
 
-    public GroupResponse getByIdGroup(Long id) {
-        GroupEntity group = groupRepository.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
-        return groupMapper.toResponse(group);
+    public GroupEntity getByIdGroup(Long id) {
+        return groupRepository.findById(id).orElseThrow(() -> new GroupNotFoundException(id));
     }
 }
