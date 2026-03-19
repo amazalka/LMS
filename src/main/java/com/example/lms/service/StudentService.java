@@ -11,6 +11,7 @@ import com.example.lms.repository.GroupRepository;
 import com.example.lms.repository.StudentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,8 +43,10 @@ public class StudentService {
         return studentMapper.toResponse(student);
     }
 
-    public List<StudentResponse> getAllStudents() {
-        return studentMapper.toResponse(studentRepository.findAll());
+    public List<StudentResponse> getAllStudents(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StudentEntity> studentPage = studentRepository.findAll(pageable);
+        return studentMapper.toResponse(studentPage.getContent());
     }
 
     public StudentResponse getByIdStudent(Long id) {

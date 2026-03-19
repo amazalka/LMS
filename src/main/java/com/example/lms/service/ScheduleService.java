@@ -65,13 +65,13 @@ public class ScheduleService {
     }
 
     //Изменять время проведения курса для определенной группы
-    public void updateTheTime(LocalDateTime time, Long scheduleId) {
+    public void updateTime(LocalDateTime time, Long scheduleId) {
         ScheduleEntity schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
         schedule.setTime(time);
     }
 
     //Удалять время проведения курса для определенной группы
-    public void deleteTheTime(Long scheduleId) {
+    public void deleteTime(Long scheduleId) {
         ScheduleEntity schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
         schedule.setTime(null);
     }

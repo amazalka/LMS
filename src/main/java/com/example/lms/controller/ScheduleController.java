@@ -44,15 +44,15 @@ public class ScheduleController {
 
     @PatchMapping("/{id}/time")
     //Изменять время проведения курса для определенной группы
-    public LocalDateTime updateTheTime(@RequestBody UpdateScheduleTimeRequest request, @PathVariable Long id) {
-        scheduleService.updateTheTime(request.getTime(), id);
+    public LocalDateTime updateTime(@RequestBody UpdateScheduleTimeRequest request, @PathVariable Long id) {
+        scheduleService.updateTime(request.getTime(), id);
         return request.getTime();
     }
 
     @DeleteMapping("/{id}/time")
     //Удалять время проведения курса для определенной группы
-    public void deleteTheTime(@PathVariable Long id) {
-        scheduleService.deleteTheTime(id);
+    public void deleteTime(@PathVariable Long id) {
+        scheduleService.deleteTime(id);
     }
 
     @GetMapping("/groups/{groupId}")

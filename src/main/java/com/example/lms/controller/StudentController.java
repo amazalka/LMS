@@ -31,8 +31,8 @@ public class StudentController {
     }
 
     @GetMapping
-    public List<StudentResponse> getAll() {
-        return studentService.getAllStudents();
+    public List<StudentResponse> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return studentService.getAllStudents(page, size);
     }
 
     @GetMapping("/{id}")
