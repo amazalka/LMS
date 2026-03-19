@@ -2,15 +2,13 @@ package com.example.lms.service;
 
 import com.example.lms.dto.request.StudentRequest;
 import com.example.lms.dto.response.StudentResponse;
-import com.example.lms.exception.GroupNotFoundException;
-import com.example.lms.exception.StudentNotFoundException;
+import com.example.lms.exception.*;
 import com.example.lms.mapper.StudentMapper;
-import com.example.lms.model.GroupEntity;
-import com.example.lms.model.StudentEntity;
-import com.example.lms.repository.GroupRepository;
-import com.example.lms.repository.StudentRepository;
+import com.example.lms.model.*;
+import com.example.lms.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,8 +40,10 @@ public class StudentService {
         return studentMapper.toResponse(student);
     }
 
-    public List<StudentResponse> getAllStudents() {
-        return studentMapper.toResponse(studentRepository.findAll());
+    public List<StudentResponse> getAllStudents(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StudentEntity> studentPage = studentRepository.findAll(pageable);
+        return studentMapper.toResponse(studentPage.getContent());
     }
 
     public StudentResponse getByIdStudent(Long id) {
