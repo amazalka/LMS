@@ -1,13 +1,14 @@
 package com.example.lms.service;
 
-import com.example.lms.exception.GroupNotFoundException;
-import com.example.lms.exception.StudentNotFoundException;
-import com.example.lms.model.GroupEntity;
-import com.example.lms.model.StudentEntity;
-import com.example.lms.repository.GroupRepository;
-import com.example.lms.repository.StudentRepository;
+import com.example.lms.dto.request.StudentRequest;
+import com.example.lms.dto.response.StudentResponse;
+import com.example.lms.exception.*;
+import com.example.lms.mapper.StudentMapper;
+import com.example.lms.model.*;
+import com.example.lms.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,38 +19,49 @@ import java.util.List;
 public class StudentService {
     private final StudentRepository studentRepository;
     private final GroupRepository groupRepository;
+    private final StudentMapper studentMapper;
 
-    public StudentEntity addStudent(StudentEntity student) {
-        return studentRepository.save(student);
+    public StudentResponse addStudent(StudentRequest request) {
+        StudentEntity student = studentMapper.toEntity(request);
+        studentRepository.save(student);
+        return studentMapper.toResponse(student);
     }
 
     public void deleteStudent(Long id) {
-        studentRepository.deleteById(id);
-    }
-
-    public StudentEntity updateStudent(Long id, StudentEntity updateStudent) {
         StudentEntity student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
-        student.setName(updateStudent.getName());
-        student.setLastName(updateStudent.getLastName());
-        student.setGroup(updateStudent.getGroup());
-        return student;
+        studentRepository.delete(student);
     }
 
-    public List<StudentEntity> getAllStudents() {
-        return studentRepository.findAll();
+    public StudentResponse updateStudent(Long id, StudentRequest request) {
+        StudentEntity student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
+        studentMapper.updateStudentFromRequest(student, request);
+        GroupEntity group = groupRepository.findById(request.getGroupId()).orElseThrow(() -> new GroupNotFoundException(request.getGroupId()));
+        student.setGroup(group);
+        return studentMapper.toResponse(student);
     }
 
-    public StudentEntity getByIdStudent(Long id) {
-        return studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
+    public List<StudentResponse> getAllStudents(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StudentEntity> studentPage = studentRepository.findAll(pageable);
+        return studentMapper.toResponse(studentPage.getContent());
+    }
+
+    public StudentResponse getByIdStudent(Long id) {
+        StudentEntity student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
+        return studentMapper.toResponse(student);
     }
 
     // Объединение студентов в группы
-    public List<StudentEntity> combineIntoGroups(Long groupId, List<Long> studentsId){
+    public List<StudentResponse> addIntoGroups(Long groupId, List<Long> studentsId) {
         GroupEntity group = groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
         List<StudentEntity> students = studentRepository.findAllById(studentsId);
-        for(StudentEntity student:students){
+        if (students.size() != studentsId.size()) {
+            throw new StudentNotFoundException();
+        }
+        for (StudentEntity student : students) {
             student.setGroup(group);
         }
-        return students;
+        return studentMapper.toResponse(students);
     }
 }
+

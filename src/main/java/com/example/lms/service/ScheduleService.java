@@ -1,14 +1,11 @@
 package com.example.lms.service;
 
+import com.example.lms.dto.request.ScheduleRequest;
+import com.example.lms.dto.response.ScheduleResponse;
 import com.example.lms.exception.*;
-import com.example.lms.model.CourseEntity;
-import com.example.lms.model.GroupEntity;
-import com.example.lms.model.ScheduleEntity;
-import com.example.lms.model.TeacherEntity;
-import com.example.lms.repository.CourseRepository;
-import com.example.lms.repository.GroupRepository;
-import com.example.lms.repository.ScheduleRepository;
-import com.example.lms.repository.TeacherRepository;
+import com.example.lms.mapper.ScheduleMapper;
+import com.example.lms.model.*;
+import com.example.lms.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,61 +21,68 @@ public class ScheduleService {
     private final GroupRepository groupRepository;
     private final CourseRepository courseRepository;
     private final TeacherRepository teacherRepository;
+    private final ScheduleMapper scheduleMapper;
 
     //Добавление группы на курсы
     //Назначение времени проведения курса для определенной группы
-    public ScheduleEntity createSchedule(Long groupId, Long courseId, Long teacherId, LocalDateTime time) {
-        GroupEntity group = groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId));
-        CourseEntity course = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFoundException(courseId));
-        TeacherEntity teacher = teacherRepository.findById(teacherId).orElseThrow(() -> new TeacherNotFoundException(teacherId));
+    public ScheduleResponse createSchedule(ScheduleRequest request) {
+        GroupEntity group = groupRepository.findById(request.getGroupId()).orElseThrow(() -> new GroupNotFoundException(request.getGroupId()));
+        CourseEntity course = courseRepository.findById(request.getCourseId()).orElseThrow(() -> new CourseNotFoundException(request.getCourseId()));
+        TeacherEntity teacher = teacherRepository.findById(request.getTeacherId()).orElseThrow(() -> new TeacherNotFoundException(request.getTeacherId()));
         ScheduleEntity schedule = new ScheduleEntity();
-        schedule.setTime(time);
+        schedule.setTime(request.getTime());
         schedule.setGroup(group);
         schedule.setTeacher(teacher);
         schedule.setCourse(course);
-        return scheduleRepository.save(schedule);
+        ScheduleEntity savedSchedule = scheduleRepository.save(schedule);
+        return scheduleMapper.toResponse(savedSchedule);
     }
 
     public void deleteSchedule(Long id) {
-        scheduleRepository.deleteById(id);
-    }
-
-    public ScheduleEntity updateSchedule(Long id, ScheduleEntity updateSchedule) {
         ScheduleEntity schedule = scheduleRepository.findById(id).orElseThrow(() -> new ScheduleNotFoundException(id));
-        schedule.setGroup(updateSchedule.getGroup());
-        schedule.setTime(updateSchedule.getTime());
-        schedule.setTeacher(updateSchedule.getTeacher());
-        schedule.setCourse(updateSchedule.getCourse());
-        return schedule;
+        scheduleRepository.delete(schedule);
     }
 
-    public List<ScheduleEntity> getAllSchedules() {
-        return scheduleRepository.findAll();
+    public ScheduleResponse updateSchedule(Long id, ScheduleRequest request) {
+        ScheduleEntity schedule = scheduleRepository.findById(id).orElseThrow(() -> new ScheduleNotFoundException(id));
+        GroupEntity group = groupRepository.findById(request.getGroupId()).orElseThrow(() -> new GroupNotFoundException(request.getGroupId()));
+        CourseEntity course = courseRepository.findById(request.getCourseId()).orElseThrow(() -> new CourseNotFoundException(request.getCourseId()));
+        TeacherEntity teacher = teacherRepository.findById(request.getTeacherId()).orElseThrow(() -> new TeacherNotFoundException(request.getTeacherId()));
+        schedule.setGroup(group);
+        schedule.setTime(request.getTime());
+        schedule.setTeacher(teacher);
+        schedule.setCourse(course);
+        return scheduleMapper.toResponse(schedule);
     }
 
-    public ScheduleEntity getByIdSchedule(Long id) {
-        return scheduleRepository.findById(id).orElseThrow(() -> new ScheduleNotFoundException(id));
+    public List<ScheduleResponse> getAllSchedules() {
+        return scheduleMapper.toResponse(scheduleRepository.findAll());
+    }
+
+    public ScheduleResponse getByIdSchedule(Long id) {
+        ScheduleEntity schedule = scheduleRepository.findById(id).orElseThrow(() -> new ScheduleNotFoundException(id));
+        return scheduleMapper.toResponse(schedule);
     }
 
     //Изменять время проведения курса для определенной группы
-    public void updateTheTimeForAGroup(LocalDateTime time, Long scheduleId) {
-        ScheduleEntity schedule = scheduleRepository.findBySchedule_Id(scheduleId).orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
+    public void updateTheTime(LocalDateTime time, Long scheduleId) {
+        ScheduleEntity schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
         schedule.setTime(time);
     }
 
     //Удалять время проведения курса для определенной группы
-    public void deleteTheTimeForAGroup(Long scheduleId) {
-        ScheduleEntity schedule = scheduleRepository.findBySchedule_Id(scheduleId).orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
+    public void deleteTheTime(Long scheduleId) {
+        ScheduleEntity schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
         schedule.setTime(null);
     }
 
     //Просматривать график проведения курсов для каждой группы
-    public List<ScheduleEntity> getTheCourseScheduleForGroup(Long groupId) {
-        return scheduleRepository.findAllByGroup_Id(groupId);
+    public List<ScheduleResponse> getTheCourseScheduleForGroup(Long groupId) {
+        return scheduleMapper.toResponse(scheduleRepository.findAllByGroup_Id(groupId));
     }
 
     //Просматривать график занятий для каждого преподавателя
-    public List<ScheduleEntity> getTheCourseScheduleForTeacher(Long teacherId) {
-        return scheduleRepository.findAllByTeacher_Id(teacherId);
+    public List<ScheduleResponse> getTheCourseScheduleForTeacher(Long teacherId) {
+        return scheduleMapper.toResponse(scheduleRepository.findAllByTeacher_Id(teacherId));
     }
 }
