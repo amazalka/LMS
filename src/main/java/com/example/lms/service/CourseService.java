@@ -8,6 +8,7 @@ import com.example.lms.model.CourseEntity;
 import com.example.lms.repository.CourseRepository;
 import jakarta.transaction.Transactional;
 import lombok.*;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,7 +42,9 @@ public class CourseService {
         return courseMapper.toResponse(course);
     }
 
-    public List<CourseResponse> getAllCourses() {
-        return courseMapper.toResponse(courseRepository.findAll());
+    public List<CourseResponse> getAllCourses(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CourseEntity> coursePage = courseRepository.findAll(pageable);
+        return courseMapper.toResponse(coursePage.getContent());
     }
 }

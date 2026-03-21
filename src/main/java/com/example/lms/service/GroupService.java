@@ -8,6 +8,7 @@ import com.example.lms.model.GroupEntity;
 import com.example.lms.repository.GroupRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,8 +37,10 @@ public class GroupService {
         return groupMapper.toResponse(group);
     }
 
-    public List<GroupResponse> getAllGroups() {
-        return groupMapper.toResponse(groupRepository.findAll());
+    public List<GroupResponse> getAllGroups(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<GroupEntity> groupPage = groupRepository.findAll(pageable);
+        return groupMapper.toResponse(groupPage.getContent());
     }
 
     public GroupResponse getByIdGroup(Long id) {

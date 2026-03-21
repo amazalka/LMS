@@ -31,8 +31,8 @@ public class GroupController {
     }
 
     @GetMapping
-    public List<GroupResponse> getAll() {
-        return groupService.getAllGroups();
+    public List<GroupResponse> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return groupService.getAllGroups(page, size);
     }
 
     @GetMapping("/{id}")

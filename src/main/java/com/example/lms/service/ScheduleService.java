@@ -6,8 +6,10 @@ import com.example.lms.exception.*;
 import com.example.lms.mapper.ScheduleMapper;
 import com.example.lms.model.*;
 import com.example.lms.repository.*;
+import org.springframework.data.domain.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -55,8 +57,10 @@ public class ScheduleService {
         return scheduleMapper.toResponse(schedule);
     }
 
-    public List<ScheduleResponse> getAllSchedules() {
-        return scheduleMapper.toResponse(scheduleRepository.findAll());
+    public List<ScheduleResponse> getAllSchedules(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ScheduleEntity> schedulePage = scheduleRepository.findAll(pageable);
+        return scheduleMapper.toResponse(schedulePage.getContent());
     }
 
     public ScheduleResponse getByIdSchedule(Long id) {
@@ -84,5 +88,13 @@ public class ScheduleService {
     //Просматривать график занятий для каждого преподавателя
     public List<ScheduleResponse> getTheCourseScheduleForTeacher(Long teacherId) {
         return scheduleMapper.toResponse(scheduleRepository.findAllByTeacher_Id(teacherId));
+    }
+
+    //Удалять все расписание, у которого занятие прошло более 1 года назад
+    @Scheduled(cron = "@daily")
+    public void deleteOldSchedules() {
+        LocalDateTime timeNow = LocalDateTime.now();
+        LocalDateTime timeYearAgo = timeNow.minusYears(1);
+        scheduleRepository.deleteAllByTimeBefore(timeYearAgo);
     }
 }

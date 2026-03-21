@@ -36,7 +36,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public List<CourseResponse> getAll() {
-        return courseService.getAllCourses();
+    public List<CourseResponse> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return courseService.getAllCourses(page, size);
     }
 }

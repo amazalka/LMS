@@ -9,6 +9,7 @@ import com.example.lms.repository.TeacherRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.*;
 
 import java.util.List;
 
@@ -36,8 +37,10 @@ public class TeacherService {
         return teacherMapper.toResponse(teacher);
     }
 
-    public List<TeacherResponse> getAllTeachers() {
-        return teacherMapper.toResponse(teacherRepository.findAll());
+    public List<TeacherResponse> getAllTeachers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<TeacherEntity> teacherPage = teacherRepository.findAll(pageable);
+        return teacherMapper.toResponse(teacherPage.getContent());
     }
 
     public TeacherResponse getTeacherById(Long id) {

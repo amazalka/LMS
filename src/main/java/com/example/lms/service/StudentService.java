@@ -2,13 +2,10 @@ package com.example.lms.service;
 
 import com.example.lms.dto.request.StudentRequest;
 import com.example.lms.dto.response.StudentResponse;
-import com.example.lms.exception.GroupNotFoundException;
-import com.example.lms.exception.StudentNotFoundException;
+import com.example.lms.exception.*;
 import com.example.lms.mapper.StudentMapper;
-import com.example.lms.model.GroupEntity;
-import com.example.lms.model.StudentEntity;
-import com.example.lms.repository.GroupRepository;
-import com.example.lms.repository.StudentRepository;
+import com.example.lms.model.*;
+import com.example.lms.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;

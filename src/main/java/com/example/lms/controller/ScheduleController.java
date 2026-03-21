@@ -33,8 +33,8 @@ public class ScheduleController {
     }
 
     @GetMapping
-    public List<ScheduleResponse> getAll() {
-        return scheduleService.getAllSchedules();
+    public List<ScheduleResponse> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return scheduleService.getAllSchedules(page, size);
     }
 
     @GetMapping("/{id}")

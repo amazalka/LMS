@@ -31,8 +31,8 @@ public class TeacherController {
     }
 
     @GetMapping
-    public List<TeacherResponse> getAll() {
-        return teacherService.getAllTeachers();
+    public List<TeacherResponse> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return teacherService.getAllTeachers(page, size);
     }
 
     @GetMapping("/{id}")
