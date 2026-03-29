@@ -9,7 +9,6 @@ import com.example.lms.repository.*;
 import org.springframework.data.domain.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -88,13 +87,5 @@ public class ScheduleService {
     //Просматривать график занятий для каждого преподавателя
     public List<ScheduleResponse> getTheCourseScheduleForTeacher(Long teacherId) {
         return scheduleMapper.toResponse(scheduleRepository.findAllByTeacher_Id(teacherId));
-    }
-
-    //Удалять все расписание, у которого занятие прошло более 1 года назад
-    @Scheduled(cron = "@daily")
-    public void deleteOldSchedules() {
-        LocalDateTime timeNow = LocalDateTime.now();
-        LocalDateTime timeYearAgo = timeNow.minusYears(1);
-        scheduleRepository.deleteAllByTimeBefore(timeYearAgo);
     }
 }
