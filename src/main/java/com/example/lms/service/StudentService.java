@@ -1,6 +1,7 @@
 package com.example.lms.service;
 
 import com.example.lms.dto.request.StudentRequest;
+import com.example.lms.dto.request.StudentSearchRequest;
 import com.example.lms.dto.response.StudentResponse;
 import com.example.lms.exception.*;
 import com.example.lms.mapper.StudentMapper;
@@ -62,6 +63,10 @@ public class StudentService {
             student.setGroup(group);
         }
         return studentMapper.toResponse(students);
+    }
+
+    public List<StudentResponse> search(StudentSearchRequest request){
+        return studentMapper.toResponse(studentRepository.search(request));
     }
 }
 

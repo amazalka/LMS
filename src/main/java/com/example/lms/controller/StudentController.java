@@ -1,6 +1,7 @@
 package com.example.lms.controller;
 
 import com.example.lms.dto.request.StudentRequest;
+import com.example.lms.dto.request.StudentSearchRequest;
 import com.example.lms.dto.response.StudentResponse;
 import com.example.lms.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +44,10 @@ public class StudentController {
     @PostMapping("/groups/{groupId}")
     public List<StudentResponse> addIntoGroups(@PathVariable Long groupId, @RequestBody List<Long> studentsId) {
         return studentService.addIntoGroups(groupId, studentsId);
+    }
+
+    @PostMapping("/search")
+    public List<StudentResponse> search(@RequestBody StudentSearchRequest request) {
+        return studentService.search(request);
     }
 }

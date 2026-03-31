@@ -7,33 +7,18 @@ import com.example.lms.repository.TeacherRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.*;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
-class TeacherControllerTest {
-    @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    }
-
-    @Autowired
-    private TestRestTemplate restTemplate;
+class TeacherControllerTest extends AbstractIT{
 
     @Autowired
     private TeacherRepository teacherRepository;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
 
     @BeforeEach
     void set() {
@@ -48,11 +33,16 @@ class TeacherControllerTest {
         teacherRepository.deleteAll();
     }
 
+    private TeacherRequest createTeacherRequest(String name, String lastName) {
+        TeacherRequest request = new TeacherRequest();
+        request.setName(name);
+        request.setLastName(lastName);
+        return request;
+    }
+
     @Test
     void shouldCreateTeacher() {
-        TeacherRequest request = new TeacherRequest();
-        request.setName("Josh");
-        request.setLastName("Hutcherson");
+        TeacherRequest request = createTeacherRequest("Josh", "Hutcherson");
         ResponseEntity<TeacherResponse> response = restTemplate.postForEntity("/api/v1/teachers", request, TeacherResponse.class);
         assertEquals("Josh", response.getBody().getName());
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -60,9 +50,7 @@ class TeacherControllerTest {
 
     @Test
     void shouldDeleteTeacher() {
-        TeacherRequest request = new TeacherRequest();
-        request.setName("Josh");
-        request.setLastName("Hutcherson");
+        TeacherRequest request = createTeacherRequest("Josh", "Hutcherson");
         ResponseEntity<TeacherResponse> response = restTemplate.postForEntity("/api/v1/teachers", request, TeacherResponse.class);
         Long id = response.getBody().getId();
         restTemplate.delete("/api/v1/teachers/{id}", id);
@@ -72,14 +60,10 @@ class TeacherControllerTest {
 
     @Test
     void shouldUpdateTeacher() {
-        TeacherRequest request = new TeacherRequest();
-        request.setName("Josh");
-        request.setLastName("Hutcherson");
+        TeacherRequest request = createTeacherRequest("Josh", "Hutcherson");
         ResponseEntity<TeacherResponse> response = restTemplate.postForEntity("/api/v1/teachers", request, TeacherResponse.class);
         Long id = response.getBody().getId();
-        TeacherRequest newRequest = new TeacherRequest();
-        newRequest.setName("Steve");
-        newRequest.setLastName("Harrington");
+        TeacherRequest newRequest = createTeacherRequest("Steve", "Harrington");
         restTemplate.put("/api/v1/teachers/{id}", newRequest, id);
         ResponseEntity<TeacherResponse> updateResponse = restTemplate.getForEntity("/api/v1/teachers/{id}", TeacherResponse.class, id);
         assertEquals("Steve", updateResponse.getBody().getName());
@@ -95,9 +79,7 @@ class TeacherControllerTest {
 
     @Test
     void shouldGetByIdTeacher() {
-        TeacherRequest request = new TeacherRequest();
-        request.setName("Josh");
-        request.setLastName("Hutcherson");
+        TeacherRequest request = createTeacherRequest("Josh", "Hutcherson");
         ResponseEntity<TeacherResponse> response = restTemplate.postForEntity("/api/v1/teachers", request, TeacherResponse.class);
         Long id = response.getBody().getId();
         ResponseEntity<TeacherResponse> getResponse = restTemplate.getForEntity("/api/v1/teachers/{id}", TeacherResponse.class, id);
